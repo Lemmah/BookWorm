@@ -22,7 +22,28 @@ const UserSchema = new mongoose.Schema({
     required: true
   }
 });
-// has password before saving to database
+
+// authenitcate input against database documents
+UserSchema.statics.authenticate = (email, password, callback) => {
+  User.findOne({ email: email })
+    .exec( (error, user) => {
+      if (error) {
+        return callback(error);
+      } else if (!user) {
+        const error = new Error('User not found.');
+        error.status = 401;
+        return callback(error);
+      }
+      bcrypt.compare(password, user.password, (error, result) => {
+        if (result) {
+          return callback(null, user);
+        } else {
+          return callback();
+        }
+      })
+    });
+}
+// hash password before saving to database
 UserSchema.pre('save', function(next){
   const user = this;
   bcrypt.hash(user.password, 10, function(err, hash) {
