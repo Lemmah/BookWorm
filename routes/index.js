@@ -112,4 +112,20 @@ router.get('/profile', (req, res, next) => {
     })
 });
 
+// GET /logout
+router.get('/logout', (req, res, next) => {
+  // destroy session if it exists
+  if (req.session) {
+    req.session.destroy((err) => {
+      if (err) {
+        return next(err);
+      } else {
+        res.redirect('/');
+      }
+    })
+  } else {
+    res.redirect('/');
+  }
+});
+
 module.exports = router;
