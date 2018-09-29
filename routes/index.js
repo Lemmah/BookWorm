@@ -90,4 +90,26 @@ router.post('/login', (req, res, next) => {
   }
 });
 
+// GET /profile
+router.get('/profile', (req, res, next) => {
+  if (!req.session.userId){
+    const error = new Error('You are not authorized to view this page.');
+    error.status = 403;
+    return next(error);
+  }
+  User.findById(req.session.userId)
+    .exec((error, user) => {
+      if (error) {
+        return next(error);
+      } else {
+        const templateData = {
+          title: 'Profile',
+          name: user.name,
+          favorite: user.favoriteBook
+        };
+        return res.render('profile', templateData);
+      }
+    })
+});
+
 module.exports = router;
