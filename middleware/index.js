@@ -5,4 +5,13 @@ const loggedOut = (req, res, next) => {
   return next();
 };
 
-module.exports.loggedOut = loggedOut;
+const requiresLogin = (req, res, next) => {
+  if (req.session && req.session.userId) {
+    return next();
+  }
+  const error = new Error('You should log in to view this page.');
+  error.status = 401;
+  return next(error);
+}
+
+module.exports = { loggedOut, requiresLogin };

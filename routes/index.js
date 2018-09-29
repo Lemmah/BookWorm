@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const { loggedOut } = require('../middleware');
+const { loggedOut, requiresLogin } = require('../middleware');
 
 // GET /
 router.get('/', (req, res, next) => {
@@ -92,12 +92,7 @@ router.post('/login', (req, res, next) => {
 });
 
 // GET /profile
-router.get('/profile', (req, res, next) => {
-  if (!req.session.userId){
-    const error = new Error('You are not authorized to view this page.');
-    error.status = 403;
-    return next(error);
-  }
+router.get('/profile', requiresLogin, (req, res, next) => {
   User.findById(req.session.userId)
     .exec((error, user) => {
       if (error) {
