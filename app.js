@@ -2,26 +2,30 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const app = express();
-
-// use session for trackign logins
-app.use(session({
-  secret: 'treehouse loves you',
-  resave: true,
-  saveUninitialized: false
-}));
-
-// make user ID available in templates
-app.use((req, res, next) => {
-  res.locals.currentUser = req.session.userId;
-  next();
-})
 
 // mongdb connection
 mongoose.connect('mongodb://localhost:27017/bookworm', { useNewUrlParser: true });
 const db = mongoose.connection;
 // mongo error
 db.on('error', console.error.bind(console, 'connection error:'));
+
+// use session for trackign logins
+app.use(session({
+  secret: 'treehouse loves you',
+  resave: true,
+  saveUninitialized: false,
+  store: new MongoStore({
+    mongooseConnection: db
+  })
+}));
+
+// make user ID available in templates
+app.use((req, res, next) => {
+  res.locals.currentUser = req.session.userId;
+  next();
+});
 
 // parse incoming requests
 app.use(bodyParser.json());
