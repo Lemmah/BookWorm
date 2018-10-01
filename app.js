@@ -3,18 +3,15 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const app = express();
 const User = require('./models/user');
 
 // Use passport specific middleware (strategies)
-// Configure GitHub Strategy.
-passport.use(new GitHubStrategy({
-  clientID: process.env.GITHUB_CLIENT_ID,
-  clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/github/return"
-}, (accessToken, refreshToken, profile, done) => {
+// Common getUser method to get/upsert user
+const getUser = (accessToken, refreshToken, profile, done) => {
   if(!profile.emails[0]) {
     const noEmailError = "There was an error finding your email.";
     return done(noEmailError, null);
@@ -30,7 +27,22 @@ passport.use(new GitHubStrategy({
   {
     upsert: true
   }, done);
-}));
+};
+
+// Configure GitHub Strategy.
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/github/return"
+}, getUser));
+
+// Configure Facebook Strategy.
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET,
+  callbackURL: 'http://localhost:3000/auth/facebook/return',
+  profileFields: ['id', 'displayName', 'photos', 'email']
+}, getUser));
 
 // Use passport to handle sessions.
 passport.serializeUser((user, done) => {

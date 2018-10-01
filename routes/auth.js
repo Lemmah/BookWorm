@@ -20,7 +20,22 @@ router.get('/github/return',
   (req, res) => {
     // Success Auth, redirect profile page
     res.redirect('/profile');
-  });
+});
+
+// GET /auth/login/facebook
+router.get('/login/facebook',
+  passport.authenticate('facebook'));
+
+// GET /auth/facebook/return
+router.get('/facebook/return',
+  passport.authenticate('facebook', { 
+    failureRedirect: '/',
+    scope: ['user_friends', 'manage_pages']
+  }),
+  (req, res) => {
+    // Successful authentication, redirect home.
+    res.redirect('/profile');
+});
 
 // GET /auth/logout
 router.get('/logout', (req, res) => {
