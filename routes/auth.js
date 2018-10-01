@@ -24,13 +24,15 @@ router.get('/github/return',
 
 // GET /auth/login/facebook
 router.get('/login/facebook',
-  passport.authenticate('facebook'));
+  passport.authenticate('facebook', {
+    authType: 'rerequest',
+    scope: ['email', 'user_friends', 'public_profile']
+  }));
 
 // GET /auth/facebook/return
 router.get('/facebook/return',
   passport.authenticate('facebook', { 
-    failureRedirect: '/',
-    scope: ['user_friends', 'manage_pages']
+    failureRedirect: '/'
   }),
   (req, res) => {
     // Successful authentication, redirect home.

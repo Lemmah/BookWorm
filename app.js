@@ -77,7 +77,7 @@ app.use(passport.session());
 
 // make user ID available in templates
 app.use((req, res, next) => {
-  res.locals.currentUser = req.session.userId || req.user;
+  res.locals.user = req.session.userId || req.user;
   next();
 });
 
