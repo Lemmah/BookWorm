@@ -93,15 +93,15 @@ router.post('/login', (req, res, next) => {
 
 // GET /profile
 router.get('/profile', requiresLogin, (req, res, next) => {
-  User.findById(req.session.userId)
+  const user = req.session.userId || req.user;
+  User.findById(user)
     .exec((error, user) => {
       if (error) {
         return next(error);
       } else {
         const templateData = {
           title: 'Profile',
-          name: user.name,
-          favorite: user.favoriteBook
+          user: user
         };
         return res.render('profile', templateData);
       }

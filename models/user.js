@@ -17,9 +17,14 @@ const UserSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  photo: {
+    type: String,
+    required: false,
+    trim: true
+  },
   password: {
     type: String,
-    required: true
+    required: false
   }
 });
 
